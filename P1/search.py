@@ -87,7 +87,19 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    node = Node(problem.getStartState())
+    if problem.isGoalState(node.getState()):
+         return []
+
+    frontier = util.Stack()
+    frontier.push(node)
+    explored = set()
+
+    while True:
+        if frontier.isEmpty
+            return False
+
+        node = frontier.pop()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -111,6 +123,31 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
+class Node:
+
+    def __init__(self, state):
+        self.pathCost = 0
+        self.state = state
+        self.parent = None
+        self.pathLength = 0
+
+    def getState(self):
+        return self.state
+
+    def getPathCost(self):
+        return self.pathCost
+
+    def setPathCost(self, cost):
+        self.pathCost = cost
+
+    def getPathLength(self, length):
+        self.pathLength = length
+
+    def getParent(self):
+        return self.parent
+
+    def setParent(self, parent):
+        self.parent = parent
 
 # Abbreviations
 bfs = breadthFirstSearch
