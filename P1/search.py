@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+from enum import Enum
 
 class SearchProblem:
     """
@@ -96,10 +97,19 @@ def depthFirstSearch(problem):
     explored = set()
 
     while True:
-        if frontier.isEmpty
+        if frontier.isEmpty()
             return False
 
         node = frontier.pop()
+
+        if problem.isGoalState(node.getState()):
+            return node.getParent() "this is a stupid placeholder due to laziness"
+
+        explored.add(node.getState())
+        successors = problem.getSuccessors(node.getState())
+        for successor in successors:
+        
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -123,10 +133,15 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
+class Successor(Enum):
+    nextState = 1
+    action = 2
+    cost = 3
+
 class Node:
 
-    def __init__(self, state):
-        self.pathCost = 0
+    def __init__(self, state, cost=0):
+        self.pathCost = cost
         self.state = state
         self.parent = None
         self.pathLength = 0
