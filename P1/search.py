@@ -72,11 +72,10 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def depthFirstSearch(problem):
+def search(problem, frontier):
     if problem.isGoalState(problem.getStartState()):
          return []
 
-    frontier = util.Stack()
     frontier.push( (problem.getStartState(), []) )
     explored = []
 
@@ -94,6 +93,9 @@ def depthFirstSearch(problem):
         for child, action, cost in problem.getSuccessors(parent):
             if child not in explored:
                 frontier.push( (child, actionList + [action]) )
+
+def depthFirstSearch(problem):
+    return search(problem, util.Stack())
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
