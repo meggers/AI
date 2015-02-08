@@ -18,7 +18,6 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
-from enum import Enum
 
 class SearchProblem:
     """
@@ -90,11 +89,11 @@ def depthFirstSearch(problem):
         if problem.isGoalState(parent):
             return actionList
 
-        explored.add(parent)
+        explored.append(parent)
 
-        for child, action, cost in node.getSuccessors():
+        for child, action, cost in problem.getSuccessors(parent):
             if child not in explored:
-                frontier.push(child, actionList + [action])
+                frontier.push(child, actionList.append(action))
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -117,14 +116,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
-
-def buildSolution(node):
-    actionList = []
-    while(node.getParent != None):
-        actionList.add('w')
-        node = node.getParent()
-
-    return actionList
 
 # Abbreviations
 bfs = breadthFirstSearch
