@@ -93,7 +93,7 @@ def depthFirstSearch(problem):
 
         for child, action, cost in problem.getSuccessors(parent):
             if child not in explored:
-                frontier.push(child, actionList.append(action))
+                frontier.push( (child, actionList + [action]) )
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
