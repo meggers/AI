@@ -81,7 +81,7 @@ def search(problem, frontier):
 
     while True:
         if frontier.isEmpty():
-            return None
+            return
 
         parent, actionList, totalCost = frontier.pop()
 
@@ -102,7 +102,7 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     def priorityFunction(successor):
-        return successor[2]   
+        return successor[costIndex]   
 
     return search(problem, util.PriorityQueueWithFunction(priorityFunction))
 
@@ -114,12 +114,18 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    def priorityFunction(successor):
+        return successor[costIndex] + heuristic(successor[stateIndex], problem) 
+
+    return search(problem, util.PriorityQueueWithFunction(priorityFunction))
 
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
+
+# Global Vars
+stateIndex = 0
+actionIndex = 1
+costIndex = 2
