@@ -74,42 +74,27 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
-    """
-    Search the deepest nodes in the search tree first.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
-    """
-    "*** YOUR CODE HERE ***"
-    node = Node(problem.getStartState())
-    if problem.isGoalState(node.getState()):
+    if problem.isGoalState(problem.getStartState()):
          return []
 
     frontier = util.Stack()
-    frontier.push(node)
-    explored = set()
+    frontier.push( (problem.getStartState(), []) )
+    explored = []
 
     while True:
         if frontier.isEmpty()
-            return False
+            return None
 
-        node = frontier.pop()
+        parent, actionList = frontier.pop()
 
-        if problem.isGoalState(node.getState()):
-            return node.getParent() "this is a stupid placeholder due to laziness"
+        if problem.isGoalState(parent):
+            return actionList
 
-        explored.add(node.getState())
-        successors = problem.getSuccessors(node.getState())
-        for successor in successors:
-        
+        explored.add(parent)
 
+        for child, action, cost in node.getSuccessors():
+            if child not in explored
+                frontier.push(child, actionList + [action])
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -133,36 +118,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
-class Successor(Enum):
-    nextState = 1
-    action = 2
-    cost = 3
+def buildSolution(node):
+    actionList = []
+    while(node.getParent != None):
+        actionList.add('w')
+        node = node.getParent()
 
-class Node:
-
-    def __init__(self, state, cost=0):
-        self.pathCost = cost
-        self.state = state
-        self.parent = None
-        self.pathLength = 0
-
-    def getState(self):
-        return self.state
-
-    def getPathCost(self):
-        return self.pathCost
-
-    def setPathCost(self, cost):
-        self.pathCost = cost
-
-    def getPathLength(self, length):
-        self.pathLength = length
-
-    def getParent(self):
-        return self.parent
-
-    def setParent(self, parent):
-        self.parent = parent
+    return actionList
 
 # Abbreviations
 bfs = breadthFirstSearch
