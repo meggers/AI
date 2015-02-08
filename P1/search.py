@@ -76,14 +76,14 @@ def search(problem, frontier):
     if problem.isGoalState(problem.getStartState()):
          return []
 
-    frontier.push( (problem.getStartState(), []) )
+    frontier.push( (problem.getStartState(), [], 0) )
     explored = []
 
     while True:
         if frontier.isEmpty():
             return None
 
-        parent, actionList = frontier.pop()
+        parent, actionList, totalCost = frontier.pop()
 
         if problem.isGoalState(parent):
             return actionList
@@ -92,7 +92,7 @@ def search(problem, frontier):
 
         for child, action, cost in problem.getSuccessors(parent):
             if child not in explored:
-                frontier.push( (child, actionList + [action]) )
+                frontier.push( (child, actionList + [action], totalCost + cost) )
 
 def depthFirstSearch(problem):
     return search(problem, util.Stack())
@@ -101,9 +101,10 @@ def breadthFirstSearch(problem):
     return search(problem, util.Queue())
 
 def uniformCostSearch(problem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    def priorityFunction(successor):
+        return successor[2]   
+
+    return search(problem, util.PriorityQueueWithFunction(priorityFunction))
 
 def nullHeuristic(state, problem=None):
     """
