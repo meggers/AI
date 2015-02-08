@@ -82,7 +82,7 @@ def depthFirstSearch(problem):
     explored = []
 
     while True:
-        if frontier.isEmpty()
+        if frontier.isEmpty():
             return None
 
         parent, actionList = frontier.pop()
@@ -93,7 +93,7 @@ def depthFirstSearch(problem):
         explored.add(parent)
 
         for child, action, cost in node.getSuccessors():
-            if child not in explored
+            if child not in explored:
                 frontier.push(child, actionList + [action])
 
 def breadthFirstSearch(problem):
