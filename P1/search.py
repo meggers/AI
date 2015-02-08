@@ -98,9 +98,7 @@ def depthFirstSearch(problem):
     return search(problem, util.Stack())
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return search(problem, util.Queue())
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
