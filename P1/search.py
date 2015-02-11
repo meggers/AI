@@ -79,10 +79,7 @@ def search(problem, frontier):
     frontier.push( (problem.getStartState(), [], 0) )
     explored = []
 
-    while True:
-        if frontier.isEmpty():
-            return
-
+    while not frontier.isEmpty():
         parent, actionList, totalCost = frontier.pop()
 
         if problem.isGoalState(parent):
@@ -93,6 +90,8 @@ def search(problem, frontier):
         for child, action, cost in problem.getSuccessors(parent):
             if child not in explored:
                 frontier.push( (child, actionList + [action], totalCost + cost) )
+
+    return
 
 def depthFirstSearch(problem):
     return search(problem, util.Stack())

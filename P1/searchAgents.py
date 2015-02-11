@@ -285,31 +285,29 @@ class CornersProblem(search.SearchProblem):
             if not startingGameState.hasFood(*corner):
                 print 'Warning: no food in corner ' + str(corner)
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
-        self.corners = [(1, 1), (1, self.walls.height-2), (self.walls.width-2, 1), (self.walls.width-2, self.walls.height-2)]
-        self.startState = (self.startingPosition, [])
+        self.start = (self.startingPosition, [])
 
     def getStartState(self):
-        return self.startState
+        return self.start
 
     def isGoalState(self, state):
-        if state[0] in self.corners and state[0] not in state[1]:
-            return len(state[1]) == 3
-
-        return len(state[1]) == 4
+        return len(state[1]) == len(self.corners)
 
     def getSuccessors(self, state):
         successors = []
+        x, y = state[0] 
+
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            (x, y), visited = state
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
+
             if not hitsWall:
+                visited = list(state[1])
                 if (nextx, nexty) in self.corners and (nextx, nexty) not in visited:
-                    visited.append((nextx, nexty))
- 
-                nextState = ((nextx, nexty), visited)
-                successors.append( (nextState, action, 1) )
+                    visited.append( (nextx, nexty) )
+
+                successors.append( (((nextx, nexty), visited), action, 1) )
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -327,7 +325,6 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
-
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -341,21 +338,23 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-
     if len(state[1]) == 4:
         return 0
 
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    for corner in state[1]:
-        corners.remove(corner)
+    cornersLeft = []
+    for corner in corners:
+        if corner not in state[1]:
+            cornersLeft.append(corner)
 
     currentPoint = state[0]
-    for corner in corners:
-        distance, nextCorner = min([(util.manhattanDistance(currentPoint, nextCorner), nextCorner) for nextCorner in corners])
+    shortestPath = 0
+    while len(cornersLeft) > 0:
+        distance, corner = min([(util.manhattanDistance(currentPoint, corner), corner) for corner in cornersLeft])
         shortestPath += distance
-        currentPoint = corner
+        cornersLeft.remove(nextCorner)
 
     return shortestPath
 
@@ -399,6 +398,7 @@ class FoodSearchProblem:
                 nextFood = state[1].copy()
                 nextFood[nextx][nexty] = False
                 successors.append( ( ((nextx, nexty), nextFood), direction, 1) )
+
         return successors
 
     def getCostOfActions(self, actions):
@@ -450,8 +450,30 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+
+    mh = [];
+    for ele in foodGrid.asList():
+        mh.append(util.manhattanDistance(position,ele))
+    mhmax = 0
+    if (len(mh) == 0):
+        mhmax = 0;
+    else:
+        mhmax = max(mh)
+
+    mh = []
+    maxx = 0
+    maxy = 0
+    minx = 1000
+    miny = 1000
+    for ele in foodGrid.asList():
+        maxx = max(maxx,ele[0])
+        minx = min(minx,ele[0])
+        maxy = max(maxy,ele[1])
+        miny = min(miny,ele[1])
+
+    # print (maxx,maxy), (minx,miny)
+
+    return max(mhmax,util.manhattanDistance((maxx,maxy),(minx,miny)))
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
