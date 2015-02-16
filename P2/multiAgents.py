@@ -52,29 +52,30 @@ class ReflexAgent(Agent):
         return legalMoves[chosenIndex]
 
     def evaluationFunction(self, currentGameState, action):
-        """
-        Design a better evaluation function here.
-
-        The evaluation function takes in the current and proposed successor
-        GameStates (pacman.py) and returns a number, where higher numbers are better.
-
-        The code below extracts some useful information from the state, like the
-        remaining food (newFood) and Pacman position after moving (newPos).
-        newScaredTimes holds the number of moves that each ghost will remain
-        scared because of Pacman having eaten a power pellet.
-
-        Print out these variables to see what you're getting, then combine them
-        to create a masterful evaluation function.
-        """
-        # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
+        currFood = currentGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        def getClosestDistance(locationList, myLocation):
+            distance = float("inf")
+            for location in locationList:
+                newDistance = util.manhattanDistance(location, myLocation)
+                distance = newDistance if newDistance < distance else distance
+
+            return distance
+
+        def weightFunction(foodDistance, ghostDistance):
+            foodWeight = (1 / float(foodDistance + 1))
+            ghostWeight = ((1 / float(ghostDistance + 1)) + 1) if ghostDistance < 4 else 0 
+            weightedSum = foodWeight - ghostWeight
+            return weightedSum
+
+        foodDistance = getClosestDistance(currFood.asList(), newPos)
+        ghostDistance = getClosestDistance([ghostState.getPosition() for ghostState in newGhostStates], newPos)
+        returnVal = weightFunction(foodDistance, ghostDistance)
+
+        return returnVal
 
 def scoreEvaluationFunction(currentGameState):
     """
