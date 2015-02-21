@@ -104,33 +104,43 @@ class MultiAgentSearchAgent(Agent):
 
     def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
         self.index = 0 # Pacman is always agent index 0
+        self.firstGhost = 1
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
 class MinimaxAgent(MultiAgentSearchAgent):
-    """
-      Your minimax agent (question 2)
-    """
+
+    def minimax(self, agent, state, depth):
+
+        if depth <= 0 or state.isWin() or state.isLose():
+            return self.evaluationFunction(state)
+
+        value = float("-inf") if agent == self.index else float("inf") 
+
+        actions = state.getLegalActions(agent)
+        successors = [state.generateSuccessor(agent, action) for action in actions]        
+
+        if agent == self.index:
+            minmax = lambda x, y: max(x, self.minimax( agent + 1, y, depth ))
+        elif agent == state.getNumAgents() - 1:
+            minmax = lambda x, y: min(x, self.minimax( self.index, y, depth - 1 ))
+        else:
+            minmax = lambda x, y: min(x, self.minimax( agent + 1, y, depth )) 
+
+        for successor in successors:
+            value = minmax( value, successor )
+
+        return value;
 
     def getAction(self, gameState):
-        """
-          Returns the minimax action from the current gameState using self.depth
-          and self.evaluationFunction.
+        actions = gameState.getLegalActions(self.index)
+        successors = [gameState.generateSuccessor(self.index, action) for action in actions]
 
-          Here are some method calls that might be useful when implementing minimax.
+        options = {}
+        for index, successor in enumerate(successors):
+            options[ self.minimax(self.firstGhost, successor, self.depth) ] = actions[index]
 
-          gameState.getLegalActions(agentIndex):
-            Returns a list of legal actions for an agent
-            agentIndex=0 means Pacman, ghosts are >= 1
-
-          gameState.generateSuccessor(agentIndex, action):
-            Returns the successor game state after an agent takes an action
-
-          gameState.getNumAgents():
-            Returns the total number of agents in the game
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return options[max(options.keys())]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
