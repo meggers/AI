@@ -182,16 +182,16 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         alpha = float("-inf")
         beta = float("inf")
         actions = gameState.getLegalActions(self.index)
-        successors = [gameState.generateSuccessor(self.index, action) for action in actions]
 
         best = 0 
         current = float("-inf")
-        for index, successor in enumerate(successors):
+        for action in actions:
+            successor = gameState.generateSuccessor(self.index, action)
             tmp = self.minimax(self.firstGhost, successor, self.depth, alpha, beta)
 
             if tmp > current:
                 current = tmp
-                best = actions[index]
+                best = action
             
             if current > beta:
                 return best
@@ -205,15 +205,37 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       Your expectimax agent (question 4)
     """
 
-    def getAction(self, gameState):
-        """
-          Returns the expectimax action using self.depth and self.evaluationFunction
+    def expectimax(self, agent, state, depth):
 
-          All ghosts should be modeled as choosing uniformly at random from their
-          legal moves.
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        if depth <= 0 or state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+
+        value = float("-inf") if agent == self.index else 0 
+        actions = state.getLegalActions(agent)
+        successors = [state.generateSuccessor(agent, action) for action in actions]   
+        weight = 1.0/len(actions)
+
+        if agent == self.index:
+            emax = lambda x, y: max(x, self.expectimax( agent + 1, y, depth ))
+        elif agent == state.getNumAgents() - 1:
+            emax = lambda x, y: x * self.expectimax( self.index, y, depth - 1 )
+        else:
+            emax = lambda x, y: x * self.expectimax( agent + 1, y, depth ) 
+
+        for successor in successors:
+            value = emax( value, successor ) if agent == self.index else value + emax( weight, successor)
+        
+        return value
+
+    def getAction(self, gameState):        
+        actions = gameState.getLegalActions(self.index)
+        successors = [gameState.generateSuccessor(self.index, action) for action in actions]
+
+        options = {}
+        for index, successor in enumerate(successors):
+            options[ self.expectimax(self.firstGhost, successor, self.depth) ] = actions[index]
+
+        return options[max(options.keys())]
 
 def betterEvaluationFunction(currentGameState):
     """
