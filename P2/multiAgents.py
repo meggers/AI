@@ -201,9 +201,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         return best
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
-    """
-      Your expectimax agent (question 4)
-    """
 
     def expectimax(self, agent, state, depth):
 
@@ -244,8 +241,36 @@ def betterEvaluationFunction(currentGameState):
 
       DESCRIPTION: <write something here so we know what you did>
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    def getClosest(myLocation, locationList):
+        return min([util.manhattanDistance(location, myLocation) for location in locationList]) if len(locationList) > 0 else 0
+    
+    position = currentGameState.getPacmanPosition()
+
+    foodGrid = currentGameState.getFood()
+    foodPositions = foodGrid.asList()
+    
+    capsulePositions = currentGameState.getCapsules()
+
+    scaredGhostPositions = []
+    normalGhostPositions = []
+    for ghost in currentGameState.getGhostStates():
+        if (ghost.scaredTimer > 0):
+            scaredGhostPositions.append(ghost.getPosition())
+        else:
+            normalGhostPositions.append(ghost.getPosition())
+
+    closestScaredGhost = getClosest(position, scaredGhostPositions)
+    closestNormalGhost = getClosest(position, normalGhostPositions)
+    closestCapsule = getClosest(position, capsulePositions)
+    closestFood = getClosest(position, foodPositions)
+
+    scaredGhostWeight = (1 / (closestScaredGhost + 1.0)) + 1 if closestScaredGhost < 4 else 0 
+    normalGhostWeight = -((1 / (closestNormalGhost + 1.0)) + 1) if closestNormalGhost < 4 else 0 
+    capsuleWeight = 1 / (closestCapsule + 1.0)
+    foodWeight = 1 / (closestFood + 1.0)
+
+    return foodWeight + scaredGhostWeight + foodWeight + capsuleWeight + currentGameState.getScore()
 
 # Abbreviation
 better = betterEvaluationFunction
