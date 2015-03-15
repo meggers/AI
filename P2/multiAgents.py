@@ -15,6 +15,9 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
+import imp
+import inspect
+import sys
 
 from game import Agent
 
@@ -246,15 +249,13 @@ def betterEvaluationFunction(currentGameState):
         return min([util.manhattanDistance(location, myLocation) for location in locationList]) if len(locationList) > 0 else 0
     
     position = currentGameState.getPacmanPosition()
-
-    foodGrid = currentGameState.getFood()
-    foodPositions = foodGrid.asList()
-    
+    foodPositions =  currentGameState.getFood().asList()    
     capsulePositions = currentGameState.getCapsules()
+    ghostStates = currentGameState.getGhostStates()
 
     scaredGhostPositions = []
     normalGhostPositions = []
-    for ghost in currentGameState.getGhostStates():
+    for ghost in ghostStates:
         if (ghost.scaredTimer > 0):
             scaredGhostPositions.append(ghost.getPosition())
         else:
@@ -265,10 +266,10 @@ def betterEvaluationFunction(currentGameState):
     closestCapsule = getClosest(position, capsulePositions)
     closestFood = getClosest(position, foodPositions)
 
-    scaredGhostWeight = (1 / (closestScaredGhost + 1.0)) + 1 if closestScaredGhost < 4 else 0 
-    normalGhostWeight = -((1 / (closestNormalGhost + 1.0)) + 1) if closestNormalGhost < 4 else 0 
-    capsuleWeight = 1 / (closestCapsule + 1.0)
-    foodWeight = 1 / (closestFood + 1.0)
+    scaredGhostWeight = (1 / float(closestScaredGhost + 1.0)) + 1 if closestScaredGhost < 4 else 0 
+    normalGhostWeight = -((1 / float(closestNormalGhost + 1.0)) + 1) if closestNormalGhost < 4 else 0 
+    capsuleWeight = 1 / float((closestCapsule + 1.0))
+    foodWeight = 1 / float(closestFood + 1.0)
 
     return foodWeight + scaredGhostWeight + foodWeight + capsuleWeight + currentGameState.getScore()
 
