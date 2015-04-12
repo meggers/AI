@@ -137,60 +137,13 @@ class ExactInference(InferenceModule):
         self.beliefs = allPossible
 
     def elapseTime(self, gameState):
-        """
-        Update self.beliefs in response to a time step passing from the current
-        state.
+        allPossible = util.Counter()
+        for oldPos in self.legalPositions:
+            newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, oldPos))
+            for newPos, prob in newPosDist.items():
+                allPossible[newPos] += prob * self.beliefs[oldPos]
 
-        The transition model is not entirely stationary: it may depend on
-        Pacman's current position (e.g., for DirectionalGhost).  However, this
-        is not a problem, as Pacman's current position is known.
-
-        In order to obtain the distribution over new positions for the ghost,
-        given its previous position (oldPos) as well as Pacman's current
-        position, use this line of code:
-
-          newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, oldPos))
-
-        Note that you may need to replace "oldPos" with the correct name of the
-        variable that you have used to refer to the previous ghost position for
-        which you are computing this distribution. You will need to compute
-        multiple position distributions for a single update.
-
-        newPosDist is a util.Counter object, where for each position p in
-        self.legalPositions,
-
-        newPostDist[p] = Pr( ghost is at position p at time t + 1 | ghost is at position oldPos at time t )
-
-        (and also given Pacman's current position).  You may also find it useful
-        to loop over key, value pairs in newPosDist, like:
-
-          for newPos, prob in newPosDist.items():
-            ...
-
-        *** GORY DETAIL AHEAD ***
-
-        As an implementation detail (with which you need not concern yourself),
-        the line of code at the top of this comment block for obtaining
-        newPosDist makes use of two helper methods provided in InferenceModule
-        above:
-
-          1) self.setGhostPosition(gameState, ghostPosition)
-              This method alters the gameState by placing the ghost we're
-              tracking in a particular position.  This altered gameState can be
-              used to query what the ghost would do in this position.
-
-          2) self.getPositionDistribution(gameState)
-              This method uses the ghost agent to determine what positions the
-              ghost will move to from the provided gameState.  The ghost must be
-              placed in the gameState with a call to self.setGhostPosition
-              above.
-
-        It is worthwhile, however, to understand why these two helper methods
-        are used and how they combine to give us a belief distribution over new
-        positions after a time update from a particular position.
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        self.beliefs = allPossible
 
     def getBeliefDistribution(self):
         return self.beliefs
