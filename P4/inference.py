@@ -121,46 +121,17 @@ class ExactInference(InferenceModule):
         self.beliefs.normalize()
 
     def observe(self, observation, gameState):
-        """
-        Updates beliefs based on the distance observation and Pacman's position.
-
-        The noisyDistance is the estimated Manhattan distance to the ghost you
-        are tracking.
-
-        The emissionModel below stores the probability of the noisyDistance for
-        any true distance you supply. That is, it stores P(noisyDistance |
-        TrueDistance).
-
-        self.legalPositions is a list of the possible ghost positions (you
-        should only consider positions that are in self.legalPositions).
-
-        A correct implementation will handle the following special case:
-          *  When a ghost is captured by Pacman, all beliefs should be updated
-             so that the ghost appears in its prison cell, position
-             self.getJailPosition()
-
-             You can check if a ghost has been captured by Pacman by
-             checking if it has a noisyDistance of None (a noisy distance
-             of None will be returned if, and only if, the ghost is
-             captured).
-        """
         noisyDistance = observation
         emissionModel = busters.getObservationDistribution(noisyDistance)
         pacmanPosition = gameState.getPacmanPosition()
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
-        # Replace this code with a correct observation update
-        # Be sure to handle the "jail" edge case where the ghost is eaten
-        # and noisyDistance is None
         allPossible = util.Counter()
-        for p in self.legalPositions:
-            trueDistance = util.manhattanDistance(p, pacmanPosition)
-            if emissionModel[trueDistance] > 0:
-                allPossible[p] = 1.0
 
-        "*** END YOUR CODE HERE ***"
+        if noisyDistance is None:
+            allPossible[self.getJailPosition()] = 1.0
+        else:
+            for loc in self.legalPositions:
+                distance = util.manhattanDistance(loc, pacmanPosition)
+                allPossible[loc] = emissionModel[distance] * self.beliefs[loc]
 
         allPossible.normalize()
         self.beliefs = allPossible
