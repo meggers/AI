@@ -138,6 +138,7 @@ class ExactInference(InferenceModule):
 
     def elapseTime(self, gameState):
         allPossible = util.Counter()
+
         for oldPos in self.legalPositions:
             newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, oldPos))
             for newPos, prob in newPosDist.items():
