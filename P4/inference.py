@@ -190,32 +190,6 @@ class ParticleFilter(InferenceModule):
             unassigned -= len(selectedElements)
 
     def observe(self, observation, gameState):
-        """
-        Update beliefs based on the given distance observation. Make sure to
-        handle the special case where all particles have weight 0 after
-        reweighting based on observation. If this happens, resample particles
-        uniformly at random from the set of legal positions
-        (self.legalPositions).
-
-        A correct implementation will handle two special cases:
-          1) When a ghost is captured by Pacman, all particles should be updated
-             so that the ghost appears in its prison cell,
-             self.getJailPosition()
-
-             As before, you can check if a ghost has been captured by Pacman by
-             checking if it has a noisyDistance of None.
-
-          2) When all particles receive 0 weight, they should be recreated from
-             the prior distribution by calling initializeUniformly. The total
-             weight for a belief distribution can be found by calling totalCount
-             on a Counter object
-
-        util.sample(Counter object) is a helper method to generate a sample from
-        a belief distribution.
-
-        You may also want to use util.manhattanDistance to calculate the
-        distance between a particle and Pacman's position.
-        """
         noisyDistance = observation
         emissionModel = busters.getObservationDistribution(noisyDistance)
         pacmanPosition = gameState.getPacmanPosition()
@@ -237,7 +211,6 @@ class ParticleFilter(InferenceModule):
                 for _ in range(self.numParticles):
                     self.particles.append(util.sample(newBelief))
 
-
     def elapseTime(self, gameState):
         """
         Update beliefs for a time step elapsing.
@@ -252,8 +225,13 @@ class ParticleFilter(InferenceModule):
         util.sample(Counter object) is a helper method to generate a sample from
         a belief distribution.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        tmp = []
+        for particle in self.particles:
+            newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, particle))
+            tmp.append(util.sample(newPosDist))
+
+        self.particles = tmp
 
     def getBeliefDistribution(self):
         beliefDistribution = util.Counter()
