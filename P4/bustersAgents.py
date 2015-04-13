@@ -129,33 +129,6 @@ class GreedyBustersAgent(BustersAgent):
         self.distancer = Distancer(gameState.data.layout, False)
 
     def chooseAction(self, gameState):
-        """
-        First computes the most likely position of each ghost that has
-        not yet been captured, then chooses an action that brings
-        Pacman closer to the closest ghost (according to mazeDistance!).
-
-        To find the mazeDistance between any two positions, use:
-          self.distancer.getDistance(pos1, pos2)
-
-        To find the successor position of a position after an action:
-          successorPosition = Actions.getSuccessor(position, action)
-
-        livingGhostPositionDistributions, defined below, is a list of
-        util.Counter objects equal to the position belief
-        distributions for each of the ghosts that are still alive.  It
-        is defined based on (these are implementation details about
-        which you need not be concerned):
-
-          1) gameState.getLivingGhosts(), a list of booleans, one for each
-             agent, indicating whether or not the agent is alive.  Note
-             that pacman is always agent 0, so the ghosts are agents 1,
-             onwards (just as before).
-
-          2) self.ghostBeliefs, the list of belief distributions for each
-             of the ghosts (including ghosts that are not alive).  The
-             indices into this list should be 1 less than indices into the
-             gameState.getLivingGhosts() list.
-        """
         pacmanPosition = gameState.getPacmanPosition()
         legal = [a for a in gameState.getLegalPacmanActions()]
         livingGhosts = gameState.getLivingGhosts()

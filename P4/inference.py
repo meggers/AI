@@ -161,24 +161,33 @@ class ParticleFilter(InferenceModule):
     def __init__(self, ghostAgent, numParticles=300):
         InferenceModule.__init__(self, ghostAgent);
         self.setNumParticles(numParticles)
+        self.particles = []
 
     def setNumParticles(self, numParticles):
         self.numParticles = numParticles
 
 
     def initializeUniformly(self, gameState):
-        """
-        Initializes a list of particles. Use self.numParticles for the number of
-        particles. Use self.legalPositions for the legal board positions where a
-        particle could be located.  Particles should be evenly (not randomly)
-        distributed across positions in order to ensure a uniform prior.
+        def uniformlyIndexedElements(n, domain):
+            if not 0 <= n <= len(domain):
+                return list(domain)
 
-        Note: the variable you store your particles in must be a list; a list is
-        simply a collection of unweighted variables (positions in this case).
-        Storing your particles as a Counter (where there could be an associated
-        weight with each position) is incorrect and may produce errors.
-        """
-        "*** YOUR CODE HERE ***"
+            step = int((len(domain) - 1.0)/(n - 1.0))
+
+            elements = []
+            for i in range(n):
+                elements.append(domain[i * step])
+
+            return elements
+
+        self.particles = []
+        unassigned = self.numParticles
+
+        self.particles.extend( uniformlyIndexedElements(unassigned, self.legalPositions) )
+        while unassigned > 0:
+            selectedElements = uniformlyIndexedElements(unassigned, self.legalPositions)
+            self.particles.extend( selectedElements )
+            unassigned -= len(selectedElements)
 
     def observe(self, observation, gameState):
         """
@@ -210,8 +219,24 @@ class ParticleFilter(InferenceModule):
         noisyDistance = observation
         emissionModel = busters.getObservationDistribution(noisyDistance)
         pacmanPosition = gameState.getPacmanPosition()
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        if noisyDistance is None:
+            self.particles = [self.getJailPosition()] * self.numParticles
+        else:
+            newBelief = util.Counter()
+            belief = self.getBeliefDistribution()
+
+            for position in self.legalPositions:
+                distance = util.manhattanDistance(position, pacmanPosition)
+                newBelief[position] += emissionModel[distance] * belief[position]
+
+            if newBelief.totalCount() == 0:
+                self.initializeUniformly(gameState)
+            else:
+                self.particles = []
+                for _ in range(self.numParticles):
+                    self.particles.append(util.sample(newBelief))
+
 
     def elapseTime(self, gameState):
         """
@@ -231,14 +256,12 @@ class ParticleFilter(InferenceModule):
         util.raiseNotDefined()
 
     def getBeliefDistribution(self):
-        """
-        Return the agent's current belief state, a distribution over ghost
-        locations conditioned on all evidence and time passage. This method
-        essentially converts a list of particles into a belief distribution (a
-        Counter object)
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        beliefDistribution = util.Counter()
+        for particle in self.particles:
+            beliefDistribution[particle] += 1
+
+        beliefDistribution.normalize()
+        return beliefDistribution
 
 class MarginalInference(InferenceModule):
     """
